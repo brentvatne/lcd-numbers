@@ -2,16 +2,17 @@ require './lcd_characters'
 
 class LcdNumberPrinter
   include LcdCharacters
+  attr_reader :numbers, :size
 
-  def initialize(numbers, size)
+  def initialize(numbers, size = 2)
+    numbers = numbers.split(//).map(&:to_i) if numbers.respond_to?(:split)
     @numbers, @size = numbers, size
   end
 
-  def render
-    output = []
-    if @size == 1 
-      @numbers.each { |n| output.push(LcdNumbers[n]); output.push(Spacer) }
-    else
+  def lcd_numbers
+    LcdNumbers
+  end
+
 #transform depending on size
 #for each line, if it is a horizontal line: 
 #                - x * dash
@@ -19,7 +20,49 @@ class LcdNumberPrinter
 #                - replace \s* with (n+1) - (number of |)
 #                - duplicate this line and add below
 #               if it is a blank line:
-#                - do nothing, for now. perhaps on odd or evens add duplicate
+#                - 2 + size number of blank spots
+#                - maybe on odds or events add an extra or sthing 
+
+  def scale_vertical_line(l)
+    if is_vertical_line?(l)
+      
+    end
+  end
+
+  def scale_horizontal_line(l)
+    if is_horizontal_line?(l)
+      [l.gsub("-","-"*@size)]
+    end
+  end
+
+  def scale_blank_line(l) 
+    if is_blank_line?(l)
+      [l.gsub(/^\s*$/," "*(2 + @size))]
+    end
+  end
+
+  def scale_number(n)
+    scaled_n = []
+    n.each do |l|
+      scaled_l = scale_vertical_line(l)   ||
+                 scale_horizontal_line(l) ||
+                 scale_blank_line(l)
+      raise "Invalid LcdNumber string" unless scaled_l
+      scaled_l.each { |sl| scaled_n.push(sl) }
+    end 
+    scaled_n
+  end
+
+  def render
+    output = []
+    scaled_lcd_numbers = []
+    if @size == 1 
+      @numbers.each { |n| output.push(LcdNumbers[n]); output.push(Spacer) }
+    else
+      scaled_lcd_numbers = []
+      LcdNumbers.each do |n|
+        scaled_lcd_numbers.push scale_number(n)
+      end
 
     end 
     (0..output.first.length).each do |i|
@@ -52,6 +95,6 @@ unless $*.empty?
     numbers = $*.first.split(//).map(&:to_i)
   end
 
-  lcd = LcdNumberPrinter.new(numbers, size)
-  lcd.render
+  #lcd = LcdNumberPrinter.new(numbers, size)
+  #lcd.render
 end
