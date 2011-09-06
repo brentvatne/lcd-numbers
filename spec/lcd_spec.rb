@@ -16,6 +16,10 @@ describe LcdNumberPrinter do
   end
 
   describe "helper methods" do
+    describe "number_of_vertical_lines_in" do 
+      @lcd.number_of_vertical_lines_in("|  |").should == 2
+      @lcd.number_of_vertical_lines_in("|  ").should == 1
+    end
     describe "#is_horizontal_line?" do
       it "must return true if string is a horizontal line and false if not" do
         @lcd.is_horizontal_line?(" - ").should be_true  

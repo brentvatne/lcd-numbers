@@ -29,6 +29,10 @@ class LcdNumberPrinter
     end
   end
 
+  def number_of_vertical_lines_in(l)
+    l.split(//).inject(0) { |n, c| n += 1 if c.match(/\|/) }
+  end
+
   def scale_horizontal_line(l)
     if is_horizontal_line?(l)
       [l.gsub("-","-"*@size)]
