@@ -10,8 +10,30 @@ class LcdNumberPrinter
     @scaled_lcd_numbers = generate_scaled_numbers
   end
 
-  def lcd_numbers
-    LcdNumbers
+  def generate_scaled_numbers
+    LcdNumbers.map { |n| scale_number(n) }
+  end
+
+  def render
+    output = []
+    @numbers.each { |n| output.push(@scaled_lcd_numbers[n]); output.push(Spacer) }
+    (0..output.first.length).each do |i|
+      output.each { |l| print l[i] }
+      print "\n"
+    end
+  end
+
+  def scale_number(n)
+    return n if @size == 1
+    scaled_n = []
+    n.each do |l|
+      scaled_lines = scale_vertical_line(l)   ||
+                     scale_horizontal_line(l) ||
+                     scale_blank_line(l)
+      raise "Invalid LcdNumber string #{l}" unless scaled_lines
+      scaled_lines.each { |sl| scaled_n.push(sl) }
+    end 
+    scaled_n
   end
 
   def scale_vertical_line(l)
@@ -45,32 +67,6 @@ class LcdNumberPrinter
     end
   end
 
-  def scale_number(n)
-    return n if @size == 1
-    scaled_n = []
-    n.each do |l|
-      scaled_lines = scale_vertical_line(l)   ||
-                     scale_horizontal_line(l) ||
-                     scale_blank_line(l)
-      raise "Invalid LcdNumber string #{l}" unless scaled_lines
-      scaled_lines.each { |sl| scaled_n.push(sl) }
-    end 
-    scaled_n
-  end
-
-  def generate_scaled_numbers
-    LcdNumbers.map { |n| scale_number(n) }
-  end
-
-  def render
-    output = []
-    @numbers.each { |n| output.push(@scaled_lcd_numbers[n]); output.push(Spacer) }
-    (0..output.first.length).each do |i|
-      output.each { |l| print l[i] }
-      print "\n"
-    end
-  end
-
   def is_horizontal_line?(l)
     l.match(/^\s*-\s*$/)
   end
@@ -82,6 +78,11 @@ class LcdNumberPrinter
   def is_blank_line?(l)
     l.match(/^\s*$/)
   end
+
+  def lcd_numbers
+    LcdNumbers
+  end
+
 end
 
 # ruby lcd.rb -s 1 6789   # s = 1
