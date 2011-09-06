@@ -13,24 +13,23 @@ class LcdNumberPrinter
     LcdNumbers
   end
 
-#transform depending on size
-#for each line, if it is a horizontal line: 
-#                - x * dash
-#               if it is a vertical line: 
-#                - replace \s* with (n+1) - (number of |)
-#                - duplicate this line and add below
-#               if it is a blank line:
-#                - 2 + size number of blank spots
-#                - maybe on odds or events add an extra or sthing 
-
   def scale_vertical_line(l)
     if is_vertical_line?(l)
-      
+      new_l = ""
+      if l.match(/\s+\|\s+/)
+        new_l = l.gsub(/\s+/," "*((@size + 2 - number_of_vertical_lines_in(l))/2))
+        new_l += " " if @size % 2 == 0
+      else
+        new_l = l.gsub(/\s+/," "*(@size + 2 - number_of_vertical_lines_in(l)))  
+      end
+      [new_l, new_l]
     end
   end
 
   def number_of_vertical_lines_in(l)
-    l.split(//).inject(0) { |n, c| n += 1 if c.match(/\|/) }
+    l.split("").inject(0) do |count, char| 
+      char.match(/\|/) ? count + 1 : count
+    end
   end
 
   def scale_horizontal_line(l)
@@ -51,7 +50,7 @@ class LcdNumberPrinter
       scaled_l = scale_vertical_line(l)   ||
                  scale_horizontal_line(l) ||
                  scale_blank_line(l)
-      raise "Invalid LcdNumber string" unless scaled_l
+      raise "Invalid LcdNumber string #{l}" unless scaled_l
       scaled_l.each { |sl| scaled_n.push(sl) }
     end 
     scaled_n
@@ -67,7 +66,7 @@ class LcdNumberPrinter
       LcdNumbers.each do |n|
         scaled_lcd_numbers.push scale_number(n)
       end
-
+      @numbers.each { |n| output.push(scaled_lcd_numbers[n]); output.push(Spacer) }
     end 
     (0..output.first.length).each do |i|
       output.each { |l| print l[i] }
@@ -80,7 +79,7 @@ class LcdNumberPrinter
   end
 
   def is_vertical_line?(l)
-    l.match(/^\s*\|\s*$/)
+    l.match(/^\s*\|\s*$/) || l.match(/^\|\s*\|$/)
   end
 
   def is_blank_line?(l)
@@ -99,6 +98,6 @@ unless $*.empty?
     numbers = $*.first.split(//).map(&:to_i)
   end
 
-  #lcd = LcdNumberPrinter.new(numbers, size)
-  #lcd.render
+  lcd = LcdNumberPrinter.new(numbers, size)
+  lcd.render
 end
