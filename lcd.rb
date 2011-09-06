@@ -19,7 +19,7 @@ class LcdNumberPrinter
       new_l = ""
       if l.match(/\s+\|\s+/)
         new_l = l.gsub(/\s+/," "*((@size + 2 - number_of_vertical_lines_in(l))/2))
-        new_l += " " if @size % 2 == 0
+        new_l = " " + new_l if @size % 2 == 0
       else
         new_l = l.gsub(/\s+/," "*(@size + 2 - number_of_vertical_lines_in(l)))  
       end
