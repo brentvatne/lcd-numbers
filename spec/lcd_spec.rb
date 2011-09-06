@@ -65,9 +65,11 @@ describe LcdNumberPrinter do
           @lcd.scale_horizontal_line(" - ").should == [" -- "]
         end
       end
+
       describe "#scale_vertical_line" do
-        pending
+        pending "probably should write this oh well"
       end
+
       describe "#scale_blank_line" do
         it "should return a blank line with num spaces equal to 2 + size" do
          base_size = 3
