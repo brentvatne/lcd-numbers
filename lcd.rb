@@ -45,7 +45,11 @@ class LcdNumberPrinter
       else
         new_l = l.gsub(/\s+/," "*(@size + 2 - number_of_vertical_lines_in(l)))  
       end
-      [new_l, new_l]
+      ret = []
+      @size.times do
+        ret.push new_l
+      end
+      ret
     end
   end
 
